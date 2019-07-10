@@ -4,41 +4,62 @@
 #include <errno.h>
 #include <string.h>
 
-const int WPM = 140; //desired speed
+/*
+ * Program to output files character by character to simulate typing.
+ * F Fitzgerald 2019
+ */
 
-#define AVG_CHAR_PER_WORD 6 /* https://diuna.biz/length-of-words-average-number-of-characters-in-a-word/ */
+#define AVG_CHAR_PER_WORD 6
 
-const int DELAY = 10e5 / ((WPM * AVG_CHAR_PER_WORD) / 60.0f);
-
-void usage(void)
+void usage(char *argv[])
 {
-  printf("\n");
+  printf("Outputs a file character by character using a simulated typing speed.\n");
+  printf("Usage: %s [-w words_per_min] file\n", argv[0]);
 }
 
-void print_delay(FILE *file)
+void print_delay(FILE *file, int delay)
 {
   char c;
   while((c = fgetc(file)) != EOF){
     putchar(c);
-    usleep(DELAY);
+    usleep(delay);
     fflush(stdout);
   }
 }
 
 int main(int argc, char *argv[])
 {
-  if(argc != 2){
-    usage();
+  int wpm = 140; //default words per minute
+  int opt;
+  while((opt = getopt(argc, argv, "w:")) != -1){
+    switch(opt){
+      case 'w':
+        wpm = atoi(optarg);
+        break;
+      default:
+        usage(argv);
+        exit(-1);
+    }
+  }
+
+  if((argc - optind) != 1){
+    usage(argv);
     exit(-1);
   }
 
-  FILE* file = fopen(argv[1], "r");
+  FILE* file = fopen(argv[optind], "r");
   if(!file){
     printf("Error: %s\n", strerror(errno));
     exit(-1);
   }
 
-  print_delay(file);
+  //first clear the console for full fake effect
+  printf("\033c");
+
+  //typing delay is based on characters per second
+  //since we are using usleep seconds are microseconds
+  int delay = 10e5 / ((wpm * AVG_CHAR_PER_WORD) / 60.0f);
+  print_delay(file, delay);
 
   fclose(file);
 
