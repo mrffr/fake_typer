@@ -12,13 +12,13 @@
 
 #define AVG_CHAR_PER_WORD 6 //guesstimate
 
-void cleanup()
+void cleanup(int dummy)
 {
-  printf("\033[0m"); //reset attributes
-  printf("\033[?25h"); //show cursor
-  printf("\033[2J\033[H"); //clear console
-  //printf("\033c");
-  exit(0);
+  fprintf(stderr, "\033c"); //printf doesn't work in sighandler
+
+  /* Need to kill ourselves to cleanup properly */
+  signal(SIGINT, SIG_DFL);
+  kill(getpid(), SIGINT);
 }
 
 // print errno and exit program
@@ -74,15 +74,12 @@ int main(int argc, char *argv[])
 
   /* set terminal to not echo any key inputs */
   struct termios term;
-
   if(tcgetattr(STDIN_FILENO, &term)) die();
-
   term.c_lflag &= ~((tcflag_t) ECHO); //turn off echo
-
   if(tcsetattr(STDIN_FILENO, TCSANOW, &term)) die();
 
   /* Clear the console for a better effect */
-  printf("\033[2J\033[H"); //clear console
+  printf("\033c");
   printf("\033[?;25;l"); //hide cursor
 
   /* Typing delay is based on characters per second
@@ -92,7 +89,7 @@ int main(int argc, char *argv[])
 
   fclose(file);
 
-  cleanup();
+  cleanup(0);
 
   return 0;
 }
