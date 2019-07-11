@@ -8,7 +8,6 @@
 
 /*
  * Program to output files character by character to simulate typing.
- * F Fitzgerald 2019
  */
 
 #define AVG_CHAR_PER_WORD 6 //guesstimate
@@ -81,7 +80,7 @@ int main(int argc, char *argv[])
 
   /* Clear the console for a better effect */
   printf("\033c"); //clear console
-  printf("\x1b[?;25;l"); //hide cursor
+  printf("\033[?;25;l"); //hide cursor
 
   /* Typing delay is based on characters per second
    * since we are using usleep seconds are microseconds */

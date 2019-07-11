@@ -1,2 +1,2 @@
 all:
-	gcc -o typing_delay main.c
+	gcc -o fake_typer main.c
