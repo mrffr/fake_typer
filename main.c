@@ -14,7 +14,10 @@
 
 void cleanup()
 {
-  printf("\033c");
+  printf("\033[0m"); //reset attributes
+  printf("\033[?25h"); //show cursor
+  printf("\033[2J\033[H"); //clear console
+  //printf("\033c");
   exit(0);
 }
 
@@ -79,7 +82,7 @@ int main(int argc, char *argv[])
   if(tcsetattr(STDIN_FILENO, TCSANOW, &term)) die();
 
   /* Clear the console for a better effect */
-  printf("\033c"); //clear console
+  printf("\033[2J\033[H"); //clear console
   printf("\033[?;25;l"); //hide cursor
 
   /* Typing delay is based on characters per second
