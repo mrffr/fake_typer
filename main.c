@@ -10,15 +10,12 @@
  * Program to output files character by character to simulate typing.
  */
 
-#define AVG_CHAR_PER_WORD 6 //guesstimate
+#define AVG_CHAR_PER_WORD 6
 
-void cleanup(int dummy)
+void usage(char *argv[])
 {
-  fprintf(stderr, "\033c"); //printf doesn't work in sighandler
-
-  /* Need to kill ourselves to cleanup properly */
-  signal(SIGINT, SIG_DFL);
-  kill(getpid(), SIGINT);
+  fprintf(stderr, "Outputs a file character by character using a simulated typing speed.\n");
+  fprintf(stderr, "Usage: %s [-w words_per_min] file\n", argv[0]);
 }
 
 // print errno and exit program
@@ -28,10 +25,13 @@ void die()
   exit(-1);
 }
 
-void usage(char *argv[])
+void cleanup(int dummy)
 {
-  fprintf(stderr, "Outputs a file character by character using a simulated typing speed.\n");
-  fprintf(stderr, "Usage: %s [-w words_per_min] file\n", argv[0]);
+  fprintf(stderr, "\033c"); //printf won't work in sighandler
+
+  /* Need to kill ourselves to cleanup properly */
+  signal(SIGINT, SIG_DFL);
+  kill(getpid(), SIGINT);
 }
 
 void print_delay(FILE *file, int delay)
